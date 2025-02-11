@@ -23,67 +23,34 @@ def parse_xml(xml_file, workflow_template_object_types, not_supported_handlers):
     root = tree.getroot()
 
     namespace = {'plm': 'http://www.plmxml.org/Schemas/PLMXMLSchema'}
-    data_workflow_template = []
     data_workflow_handler = []
-
-    for workflow_template_object_type in workflow_template_object_types:
-        workflow_templates = root.findall(f'.//plm:WorkflowTemplate[@objectType="{workflow_template_object_type}"]', namespace)
-        workflow_template_count = len(workflow_templates)
-        if workflow_template_count > 0:
-            data_workflow_template.append([xml_file, workflow_template_object_type, workflow_template_count])
 
     workflow_handlers = root.findall('.//plm:WorkflowHandler', namespace)
     handler_names = [handler.attrib.get('name') for handler in workflow_handlers]
     handler_count = Counter(handler_names)
 
-    for handler_name, count in handler_count.items():
-        if handler_name in not_supported_handlers:
-            data_workflow_handler.append([xml_file, handler_name, count])
+    for workflow_template_object_type in workflow_template_object_types:
+        workflow_templates = root.findall(f'.//plm:WorkflowTemplate[@objectType="{workflow_template_object_type}"]', namespace)
+        for workflow_template in workflow_templates:
+            workflow_template_name = workflow_template.attrib.get('name')
 
-    return data_workflow_template, data_workflow_handler
+            for handler_name, count in handler_count.items():
+                if handler_name in not_supported_handlers:
+                    data_workflow_handler.append([xml_file, workflow_template_name, handler_name, count])
+
+    return data_workflow_handler
 
 # Function to save the data to Excel
 def save_to_excel(data_workflow_template, data_workflow_handler, output_excel_path):
-    df_workflow_template = pd.DataFrame(data_workflow_template, columns=["File Name with path", "WorkflowTemplate Object type", "Total WorkflowTemplate Count"])
-    df_workflow_handler = pd.DataFrame(data_workflow_handler, columns=["File Name with path", "WorkflowHandler", "WorkflowTemplate Count"])
+    df_workflow_handler = pd.DataFrame(data_workflow_handler, columns=["File Name with path", "Workflow Template Name", "WorkflowHandler", "WorkflowTemplate Count"])
 
     with pd.ExcelWriter(output_excel_path, engine='openpyxl') as writer:
-        df_workflow_template.to_excel(writer, index=False, sheet_name='WorkflowTemplate')
         df_workflow_handler.to_excel(writer, index=False, sheet_name='WorkflowHandler')
 
     wb = load_workbook(output_excel_path)
     ws_workflow_handler = wb['WorkflowHandler']
-    ws_workflow_template = wb['WorkflowTemplate']
-
-    # Merge cells for both sheets using a helper function
-    merge_cells_for_same_file_name(ws_workflow_handler, df_workflow_handler, 'WorkflowHandler')
-    merge_cells_for_same_file_name(ws_workflow_template, df_workflow_template, 'WorkflowTemplate')
 
     wb.save(output_excel_path)
-
-# Function to merge cells for same file name
-def merge_cells_for_same_file_name(ws, data_frame, sheet_name):
-    groups = {}
-    for _, row in data_frame.iterrows():
-        file_name = row['File Name with path']
-        groups.setdefault(file_name, []).append((row['WorkflowTemplate Object type'] if sheet_name == 'WorkflowTemplate' else row['WorkflowHandler'], row['Total WorkflowTemplate Count'] if sheet_name == 'WorkflowTemplate' else row['WorkflowTemplate Count']))
-
-    ws.delete_rows(2, ws.max_row)
-    row = 2
-    for file_name, entries in groups.items():
-        ws[f"A{row}"] = file_name
-        merge_start_row = row
-
-        for entry in entries:
-            ws[f"B{row}"] = entry[0]  # Object Type or Handler Name
-            ws[f"C{row}"] = entry[1]  # Count
-            row += 1
-
-        if row - merge_start_row > 1:
-            ws.merge_cells(f"A{merge_start_row}:A{row-1}")
-
-        for i in range(merge_start_row, row):
-            ws[f"A{i}"].alignment = Alignment(vertical='center')
 
 # Function to run the process
 def run_process():
@@ -99,17 +66,15 @@ def run_process():
     workflow_template_object_types = load_workflow_template_object_types(input_excel_file_path)
     not_supported_handlers = load_not_supported_workflow_handlers(input_csv_file_path)
 
-    data_workflow_template = []
     data_workflow_handler = []
 
     for filename in os.listdir(directory_path):
         if filename.endswith('.xml'):
             xml_file_path = os.path.join(directory_path, filename)
-            workflow_template, workflow_handler = parse_xml(xml_file_path, workflow_template_object_types, not_supported_handlers)
-            data_workflow_template.extend(workflow_template)
+            workflow_handler = parse_xml(xml_file_path, workflow_template_object_types, not_supported_handlers)
             data_workflow_handler.extend(workflow_handler)
 
-    save_to_excel(data_workflow_template, data_workflow_handler, output_excel_path)
+    save_to_excel(data_workflow_handler, output_excel_path)
     messagebox.showinfo("Success", f"Filtered Excel report generated: {output_excel_path}")
 
 # Create the GUI window
