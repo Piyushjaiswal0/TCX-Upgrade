@@ -6,7 +6,7 @@ import openpyxl
 workspace_map = {}
 
 def load_workspace_ids_from_kit_json(kit_json_path):
-    """Loads workspace IDs from the kit JSON file."""
+    # Loads workspace IDs from the kit JSON file.
     try:
         with open(kit_json_path, 'r') as kit_file:
             kit_data = json.load(kit_file)
@@ -17,7 +17,7 @@ def load_workspace_ids_from_kit_json(kit_json_path):
         return set()
 
 def get_custom_workspace_display_name(workspaceId, directory, find_display_name_key):
-    """Fetches custom display name for the workspace from the Messages.json files."""
+    # Fetches custom display name for the workspace from the Messages.json files.
     messages_json_files = {}  # Cache of all Messages.json files
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -36,7 +36,7 @@ def get_custom_workspace_display_name(workspaceId, directory, find_display_name_
     return "Not Found"
 
 def generate_workSpace_report(directory, kit_json_path, output_excel_path):
-    """Generates a report of missing workspaces from the kit.json file."""
+    # Generates a report of missing workspaces from the kit.json file.
     # Load workspace IDs from the kit.json file
     kit_workspace_ids = load_workspace_ids_from_kit_json(kit_json_path)
 
