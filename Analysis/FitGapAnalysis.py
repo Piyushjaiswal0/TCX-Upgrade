@@ -1,8 +1,9 @@
 import os
 import configparser
-from Workflow.WorkflowReportGeneration import generate_workflow_report
-from WorkSpace.WorkSpaceReportGeneration import generate_workSpace_report
-from PropertyRendererTemplates.PropertyRendererReportGeneration import generate_propertyRenderer_report
+from src.WorkflowReportGeneration import generate_workflow_report
+from src.WorkSpaceReportGeneration import generate_workSpace_report
+from src.PropertyRendererReportGeneration import generate_propertyRenderer_report
+from src.htmlPageCreation import generate_html_report
 
 # Function to read properties from the config file and replace %BASE_PATH%
 def read_properties(file_path):
@@ -46,11 +47,21 @@ if notSupportedWorkflows and workflowTemplateObjectTypes and workflowCodeDir and
         print("Generating Workflow Handler Report")
         generate_workflow_report(workflowTemplateObjectTypes, notSupportedWorkflows, workflowCodeDir, outputDir)
         
-        print("Generating WorkSpace Report")
-        generate_workSpace_report(awcCodeDir, kitJsonFile, outputDir)
+        print("Generating Workspace Report")
+        WorkspaceTableInputs = generate_workSpace_report(awcCodeDir, kitJsonFile, outputDir)
 
         print("Generating Property Renderer Report")
-        generate_propertyRenderer_report(awcCodeDir, outputDir)
+        propertyRendererTableInputs = generate_propertyRenderer_report(awcCodeDir, outputDir)
+
+        # Defining the dictionary for both reports
+        allInputs = [
+            {"Report Name": "Workspace Report", "Data": WorkspaceTableInputs},
+            {"Report Name": "Property Renderer Report", "Data": propertyRendererTableInputs}
+        ]
+        
+        # Generate HTML for each report
+        generate_html_report(allInputs)
+
     except Exception as e:
         print(f"Error: An error occurred: {e}")
 else:

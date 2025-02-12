@@ -86,6 +86,8 @@ def generate_workSpace_report(directory, kit_json_path, output_excel_path):
         sheet['B1'] = "Workspace Type"
         sheet['C1'] = "Display Name"
 
+        workspace_data_dict = {}
+        propertyId = 1
         # Write the missing workspaces to the Excel file
         for index, workspace_id in enumerate(missing_workspace_ids, start=2):
             sheet[f"A{index}"] = workspace_id
@@ -93,12 +95,22 @@ def generate_workSpace_report(directory, kit_json_path, output_excel_path):
             sheet[f"B{index}"] = workspace_data.get("type", "Not Found")
             sheet[f"C{index}"] = workspace_data.get("display_name", "Not Found")
 
+            # Add the data to the dictionary
+            workspace_data_dict[propertyId] = {
+                "Custom Workspaces": workspace_id,
+                "Workspace Type": workspace_data.get("type", "Not Found"),
+                "Display Name": workspace_data.get("display_name", "Not Found")
+            }
+            propertyId += 1
+
         # Save the workbook to the specified output path
         output_location = os.path.join(output_excel_path, "OutputWorkspace.xlsx")
         wb.save(output_location)
 
         # Notify the user that the report was generated
         print(f"Report Generated for \"Custom Workspaces\" have been saved to {output_location}\n")
+
+        return workspace_data_dict
     else:
         # Notify the user if no workspaces are missing
         print("No Missing Workspaces", "No workspaces from kit.json are missing in the directory.\n")
