@@ -35,12 +35,15 @@ def workflow_run_process():
     directory_path = workflow_directory_var.get()
     output_excel_path = output_excel_var.get()
 
-    try:
-        # Generate report using workflow functions
-        generated_report_path = generate_workflow_report(input_excel_file_path, input_csv_file_path, directory_path, output_excel_path)
-        messagebox.showinfo("Success", f"Filtered Excel report generated: {generated_report_path}")
-    except Exception as e:
-        messagebox.showerror("Error", f"An error occurred: {e}")
+    if input_excel_file_path and input_csv_file_path and directory_path and output_excel_path:
+        try:
+            # Generate report using workflow functions
+            generate_workflow_report(input_excel_file_path, input_csv_file_path, directory_path, output_excel_path)
+            messagebox.showinfo("Success", f"Filtered Excel report generated: {output_excel_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {e}")
+    else:
+        messagebox.showwarning("Missing Information", "Please provide all the required paths.")
 
 
 def workspace_run_process():
@@ -49,14 +52,14 @@ def workspace_run_process():
     kit_json_path = kit_var.get()
     output_excel_path = output_excel_workspace_var.get()
 
-    if directory_path and kit_json_path:
+    if directory_path and kit_json_path and output_excel_path:
         try:
             # Generate workspace report
             generate_workSpace_report(directory_path, kit_json_path, output_excel_path)
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {e}")
     else:
-        messagebox.showwarning("Missing Information", "Please select both the directory and the kit.json file.")
+        messagebox.showwarning("Missing Information", "Please provide all the required paths.")
 
 
 def property_renderer_run_process():

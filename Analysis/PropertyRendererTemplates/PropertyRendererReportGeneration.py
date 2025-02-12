@@ -11,10 +11,10 @@ def generate_propertyRenderer_report(directory, output_excel_path):
     # Add headers to the Excel sheet
     sheet.append([
         "Property Name", 
-        "templateUrl", 
-        "renderFunction", 
-        "columns", 
-        "grids"
+        "Template Url", 
+        "Render Function", 
+        "Columns", 
+        "Grids"
     ])
     
     # Loop through the directory only once
@@ -31,8 +31,8 @@ def generate_propertyRenderer_report(directory, output_excel_path):
                             # Get the values for templateUrl, renderFunction, columns, and grids
                             template_url = property_data.get("templateUrl", "-")
                             render_function = property_data.get("renderFunction", "-")
-                            columns = ', '.join(property_data.get("columns", [])) if property_data.get("columns") else "-"
-                            grids = ', '.join(property_data.get("grids", [])) if property_data.get("grids") else "-"
+                            columns = ', '.join(property_data.get("columns", [])) if property_data.get("columns") else ""
+                            grids = ', '.join(property_data.get("grids", [])) if property_data.get("grids") else "All Grids"
                             
                             # Append the data to the Excel sheet
                             sheet.append([
