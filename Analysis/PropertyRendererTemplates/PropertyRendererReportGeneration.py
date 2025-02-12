@@ -46,4 +46,6 @@ def generate_propertyRenderer_report(directory, output_excel_path):
                     print(f"Error reading file {json_file_path}: {e}")
     
     # Save the workbook to the specified output path
-    workbook.save(output_excel_path)
+    output_location = os.path.join(output_excel_path, "OutputPropertyRender.xlsx")
+    workbook.save(output_location)
+    print(f"Report Generated for \"Property Renderers\" have been saved to {output_location}\n")

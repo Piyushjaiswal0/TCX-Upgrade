@@ -1,6 +1,5 @@
 import os
 import json
-from tkinter import messagebox
 import openpyxl
 
 workspace_map = {}
@@ -95,10 +94,11 @@ def generate_workSpace_report(directory, kit_json_path, output_excel_path):
             sheet[f"C{index}"] = workspace_data.get("display_name", "Not Found")
 
         # Save the workbook to the specified output path
-        wb.save(output_excel_path)
+        output_location = os.path.join(output_excel_path, "OutputWorkspace.xlsx")
+        wb.save(output_location)
 
         # Notify the user that the report was generated
-        messagebox.showinfo("Report Generated", f"The missing workspace IDs have been saved to {output_excel_path}")
+        print(f"Report Generated for \"Custom Workspaces\" have been saved to {output_location}\n")
     else:
         # Notify the user if no workspaces are missing
-        messagebox.showinfo("No Missing Workspaces", "No workspaces from kit.json are missing in the directory.")
+        print("No Missing Workspaces", "No workspaces from kit.json are missing in the directory.\n")
