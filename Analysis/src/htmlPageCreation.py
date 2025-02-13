@@ -1,6 +1,7 @@
 def generate_html_report(allInput):
     # Define a mapping of report names to their column headers
     column_headers = {
+        "Workflow Handler Report" : ["File Name with path", "Workflow Template Name", "Workflow Handler", "Workflow Template Count"],
         "Workspace Report": ["Custom Workspaces", "Workspace Type", "Display Name"],
         "Property Renderer Report": ["Property Name", "Template Url", "Render Function", "Columns", "Grids"]
     }
@@ -13,6 +14,11 @@ def generate_html_report(allInput):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>All Reports</title>
         <style>
+            h1.header {
+                font-family: 'Roboto', sans-serif;
+                font-weight: 500;
+                text-align: center;
+            }
             /* General Table Styling */
             table {
                 width: 100%;
@@ -40,7 +46,7 @@ def generate_html_report(allInput):
                 padding: 10px 20px;
                 font-size: 18px;
                 cursor: pointer;
-                background-color: #4CAF50;
+                background-color: #0A1C3E;
                 color: white;
                 border: none;
                 border-radius: 5px;
@@ -50,7 +56,7 @@ def generate_html_report(allInput):
                 background-color: #45a049;
             }
             .tab-button.active {
-                background-color: #45a049;
+                background-color: #0A1C3E;
             }
 
             /* Initially hide the tables */
@@ -121,6 +127,7 @@ def generate_html_report(allInput):
     </head>
     <body>
         <!-- Tabs for Configuration and Customization -->
+        <h1 class="header" style="text-align: center;">BMW Fit Gap Analysis Report</h1>
         <div class="tabs">
             <button id="config-tab" class="tab-button active" onclick="switchTab('config')">Configuration</button>
             <button id="customization-tab" class="tab-button" onclick="switchTab('customization')">Customization</button>

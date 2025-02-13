@@ -32,7 +32,7 @@ def parse_xml(xml_file, workflow_template_object_types, not_supported_handlers):
     
     # Store handlers and their counts in a dictionary for faster lookup
     handler_count = Counter(handler.attrib.get('name') for handler in root.findall('.//plm:WorkflowHandler', namespace))
-
+    
     # Find and process workflow templates for each object type
     for workflow_template_object_type in workflow_template_object_types:
         workflow_templates = root.findall(f'.//plm:WorkflowTemplate[@objectType="{workflow_template_object_type}"]', namespace)
@@ -46,13 +46,38 @@ def parse_xml(xml_file, workflow_template_object_types, not_supported_handlers):
 
     return data_workflow_handler
 
+def transform_to_property_structure(data_workflow_handler):
+    transformed_data = {}
+    
+    # Process each entry in data_workflow_handler
+    for entry in data_workflow_handler:
+        # Generate a unique ID for each entry based on a combination of file name and template name
+        property_id = len(transformed_data) + 1
+        transformed_data[property_id] = {
+            'File Name with path': entry[0],
+            'Workflow Template Name': entry[1],
+            'Workflow Handler': entry[2],
+            'Workflow Template Count': entry[3]
+        }
+
+    return transformed_data
+
+# Main function to generate the workflow report
 def generate_workflow_report(workflow_template_object_types, not_supported_workflows, workflow_code_dir, output_dir):
     data_workflow_handler = []
+    workspace_data_dict = {}
+
     for filename in os.listdir(workflow_code_dir):
         if filename.endswith('.xml'):
             xml_file_path = os.path.join(workflow_code_dir, filename)
             data_workflow_handler.extend(parse_xml(xml_file_path, workflow_template_object_types, not_supported_workflows))
 
+    # Save the data to Excel
     output_location = os.path.join(output_dir, "OutputWorkflowHandlers.xlsx")
     save_to_excel(data_workflow_handler, output_location)
-    print(f"Report Generated for \"Workflow Handlers\" have been saved to {output_location}\n")
+
+    # Transform the data into the desired structure
+    workspace_data_dict = transform_to_property_structure(data_workflow_handler)
+    print(f"Report Generated for \"Workflow Handlers\" has been saved to {output_location}\n")
+
+    return workspace_data_dict
