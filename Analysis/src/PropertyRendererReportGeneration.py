@@ -1,22 +1,7 @@
 import os
 import json
-import openpyxl
 
-def generate_propertyRenderer_report(directory, output_excel_path):
-    # Create a new workbook and set the active sheet
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
-    sheet.title = "PropertyRendererTemplates"
-    
-    # Add headers to the Excel sheet
-    sheet.append([
-        "Property Name", 
-        "Template Url", 
-        "Render Function", 
-        "Columns", 
-        "Grids"
-    ])
-
+def generate_propertyRenderer_report(directory):
     property_data_dict = {}
     propertyId = 1
     
@@ -39,6 +24,7 @@ def generate_propertyRenderer_report(directory, output_excel_path):
                             
                             # Add the data to the dictionary
                             property_data_dict[propertyId] = {
+                                "File path" : json_file_path,
                                 "Property Name": property_name,
                                 "Template Url": template_url,
                                 "Render Function": render_function,
@@ -47,20 +33,9 @@ def generate_propertyRenderer_report(directory, output_excel_path):
                             }
                             propertyId += 1
 
-                            # Append the data to the Excel sheet
-                            sheet.append([
-                                property_name, 
-                                template_url, 
-                                render_function, 
-                                columns, 
-                                grids
-                            ])
                 except Exception as e:
                     print(f"Error reading file {json_file_path}: {e}")
     
-    # Save the workbook to the specified output path
-    output_location = os.path.join(output_excel_path, "OutputPropertyRender.xlsx")
-    workbook.save(output_location)
-    print(f"Report Generated for \"Property Renderers\" have been saved to {output_location}\n")
+    print("Report Generated for \"Property Renderers\" \n")
 
     return property_data_dict

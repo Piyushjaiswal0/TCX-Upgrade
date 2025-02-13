@@ -2,28 +2,10 @@ import os
 import pandas as pd
 from collections import Counter
 import xml.etree.ElementTree as ET
-from openpyxl import load_workbook
-from CommonFunctions.ExcelCommonFunctions import merge_cells_in_column
 
-# Function to save the data to Excel with merged cells and alignment
-def save_to_excel(data_workflow_handler, output_excel_path):
-    # Save the extracted data to an Excel file using pandas
-    df_workflow_handler = pd.DataFrame(data_workflow_handler, columns=["File Name with path", "Workflow Template Name", "WorkflowHandler", "WorkflowTemplate Count"])
-    df_workflow_handler.to_excel(output_excel_path, index=False, sheet_name='WorkflowHandler')
-
-    # Now use openpyxl to open the saved workbook and apply cell merging and alignment
-    wb = load_workbook(output_excel_path)
-    ws = wb['WorkflowHandler']
-
-    # Merge cells in column A and B by calling the merge function
-    merge_cells_in_column(ws, 1)
-    merge_cells_in_column(ws, 2)
-
-    # Save the workbook after modifications
-    wb.save(output_excel_path)
-
+# Function to parse XML and extract workflow handler data
 def parse_xml(xml_file, workflow_template_object_types, not_supported_handlers):
-    # Parse XML file and extract workflow handler data.
+    # Parse XML file and extract workflow handler data
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
@@ -46,6 +28,7 @@ def parse_xml(xml_file, workflow_template_object_types, not_supported_handlers):
 
     return data_workflow_handler
 
+# Function to transform the data into a structured dictionary format
 def transform_to_property_structure(data_workflow_handler):
     transformed_data = {}
     
@@ -54,7 +37,7 @@ def transform_to_property_structure(data_workflow_handler):
         # Generate a unique ID for each entry based on a combination of file name and template name
         property_id = len(transformed_data) + 1
         transformed_data[property_id] = {
-            'File Name with path': entry[0],
+            'File path': entry[0],
             'Workflow Template Name': entry[1],
             'Workflow Handler': entry[2],
             'Workflow Template Count': entry[3]
@@ -63,7 +46,7 @@ def transform_to_property_structure(data_workflow_handler):
     return transformed_data
 
 # Main function to generate the workflow report
-def generate_workflow_report(workflow_template_object_types, not_supported_workflows, workflow_code_dir, output_dir):
+def generate_workflow_report(workflow_template_object_types, not_supported_workflows, workflow_code_dir):
     data_workflow_handler = []
     workspace_data_dict = {}
 
@@ -72,12 +55,8 @@ def generate_workflow_report(workflow_template_object_types, not_supported_workf
             xml_file_path = os.path.join(workflow_code_dir, filename)
             data_workflow_handler.extend(parse_xml(xml_file_path, workflow_template_object_types, not_supported_workflows))
 
-    # Save the data to Excel
-    output_location = os.path.join(output_dir, "OutputWorkflowHandlers.xlsx")
-    save_to_excel(data_workflow_handler, output_location)
-
     # Transform the data into the desired structure
     workspace_data_dict = transform_to_property_structure(data_workflow_handler)
-    print(f"Report Generated for \"Workflow Handlers\" has been saved to {output_location}\n")
+    print("Report Generated for \"Workflow Handlers\" \n")
 
     return workspace_data_dict

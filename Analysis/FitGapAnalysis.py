@@ -45,13 +45,13 @@ if notSupportedWorkflows and workflowTemplateObjectTypes and workflowCodeDir and
     try:
         # Generate reports
         print("Generating Workflow Handler Report")
-        workflowHandlerTableInputs = generate_workflow_report(workflowTemplateObjectTypes, notSupportedWorkflows, workflowCodeDir, outputDir)
+        workflowHandlerTableInputs = generate_workflow_report(workflowTemplateObjectTypes, notSupportedWorkflows, workflowCodeDir)
         
         print("Generating Workspace Report")
-        WorkspaceTableInputs = generate_workSpace_report(awcCodeDir, kitJsonFile, outputDir)
+        WorkspaceTableInputs = generate_workSpace_report(awcCodeDir, kitJsonFile)
 
         print("Generating Property Renderer Report")
-        propertyRendererTableInputs = generate_propertyRenderer_report(awcCodeDir, outputDir)
+        propertyRendererTableInputs = generate_propertyRenderer_report(awcCodeDir)
 
         # Defining the dictionary for both reports
         allInputs = [

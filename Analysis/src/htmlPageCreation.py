@@ -1,9 +1,21 @@
+import os
+
+def getFileNameFromPath(file_path):
+    # Get the base file name (including extension)
+    file_name_with_extension = os.path.basename(file_path)
+
+    # Remove the file extension to get only the file name
+    file_name_without_extension = os.path.splitext(file_name_with_extension)[0]
+
+    # The result is just the file name without extension
+    return file_name_without_extension
+
 def generate_html_report(allInput):
     # Define a mapping of report names to their column headers
     column_headers = {
-        "Workflow Handler Report" : ["File Name with path", "Workflow Template Name", "Workflow Handler", "Workflow Template Count"],
-        "Workspace Report": ["Custom Workspaces", "Workspace Type", "Display Name"],
-        "Property Renderer Report": ["Property Name", "Template Url", "Render Function", "Columns", "Grids"]
+        "Workflow Handler Report": ["File Name", "Workflow Template Name", "Workflow Handler", "Workflow Template Count"],
+        "Workspace Report": ["File Name", "Custom Workspaces", "Workspace Type", "Display Name"],
+        "Property Renderer Report": ["File Name", "Property Name", "Template Url", "Render Function", "Columns", "Grids"]
     }
 
     html_content = """
@@ -12,7 +24,7 @@ def generate_html_report(allInput):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>All Reports</title>
+        <title>BMW | Fit Gap Report</title>
         <style>
             h1.header {
                 font-family: 'Roboto', sans-serif;
@@ -36,44 +48,63 @@ def generate_html_report(allInput):
                 background-color: #f2f2f2;
             }
 
+            /* Full page styling */
+            body, html {
+                height: 100%;
+                margin: 0;
+                font-family: Arial, sans-serif;
+            }
+
             /* Tab Styling */
             .tabs {
-                text-align: center;
+                display: flex;
+                justify-content: center;
                 margin-top: 20px;
                 margin-bottom: 20px;
             }
-            .tab-button {
-                padding: 10px 20px;
-                font-size: 18px;
-                cursor: pointer;
-                background-color: #0A1C3E;
+
+            .tablink {
+                background-color: #555;
                 color: white;
+                padding: 14px 16px;
+                font-size: 17px;
+                cursor: pointer;
                 border: none;
-                border-radius: 5px;
+                outline: none;
                 margin: 0 10px;
-            }
-            .tab-button:hover {
-                background-color: #45a049;
-            }
-            .tab-button.active {
-                background-color: #0A1C3E;
+                width: auto;
+                text-align: center;
             }
 
-            /* Initially hide the tables */
-            .report-table {
+            .tablink:hover {
+                background-color: #777;
+            }
+
+            .tablink.active {
+                background-color: #4CAF50;
+            }
+
+            /* Tab Content */
+            .tabcontent {
                 display: none;
+                padding: 20px;
+                height: auto;
+                color: black;
+                margin-top: 20px;
             }
 
-            .scrollbar-hidden::-webkit-scrollbar {
-                display: none; /* For Chrome, Safari, and newer versions of Edge */
+            /* Responsive design */
+            @media screen and (max-width: 768px) {
+                .tablink {
+                    width: 100%;
+                    padding: 12px;
+                }
+                h1.header {
+                    font-size: 22px;
+                }
             }
 
-            .scrollbar-hidden {
-                -ms-overflow-style: none; /* For Internet Explorer and older versions of Edge */
-                scrollbar-width: none; /* For Firefox */
-            }
-
-            /* Style for collapsible report header */
+            /* Collapsible header */
             .collapsible-header {
                 cursor: pointer;
                 color: black;
@@ -87,33 +118,22 @@ def generate_html_report(allInput):
             .collapsible-header:hover {
                 background-color: white;
             }
-        </style>
-        <script>
-            // Function to switch between Configuration and Customization tabs
-            function switchTab(tabName) {
-                var configTab = document.getElementById("config-tab");
-                var customizationTab = document.getElementById("customization-tab");
-                var reportTables = document.querySelectorAll('.report-table');
 
-                // Remove active class from both tabs and add to the selected one
-                configTab.classList.remove("active");
-                customizationTab.classList.remove("active");
-
-                if (tabName === 'config') {
-                    configTab.classList.add("active");
-                    // Show all tables (when Configuration is clicked)
-                    reportTables.forEach(function(table) {
-                        table.style.display = "table";
-                    });
-                } else {
-                    customizationTab.classList.add("active");
-                    // Hide all tables (when Customization is clicked)
-                    reportTables.forEach(function(table) {
-                        table.style.display = "none";
-                    });
-                }
+            /* Table visibility */
+            .report-table {
+                display: none;
             }
 
+            .scrollbar-hidden::-webkit-scrollbar {
+                display: none;
+            }
+
+            .scrollbar-hidden {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        </style>
+        <script>
             // Function to toggle the visibility of a report table
             function toggleTableVisibility(reportName) {
                 var table = document.getElementById(reportName);
@@ -123,15 +143,47 @@ def generate_html_report(allInput):
                     table.style.display = "none";
                 }
             }
+
+            // Function to switch between tabs and expand reports when Configuration tab is clicked
+            function openPage(pageName, elmnt, color) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+
+                tablinks = document.getElementsByClassName("tablink");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].style.backgroundColor = "";
+                }
+
+                document.getElementById(pageName).style.display = "block";
+                elmnt.style.backgroundColor = color;
+
+                // If Configuration tab is clicked, expand all reports
+                if (pageName === 'Configuration') {
+                    var allReports = document.querySelectorAll('.report-table');
+                    allReports.forEach(function (report) {
+                        report.style.display = "table";
+                    });
+                }
+            }
+
+            // Default open tab
+            window.onload = function() {
+                document.getElementById("defaultOpen").click();
+            }
         </script>
     </head>
     <body>
         <!-- Tabs for Configuration and Customization -->
-        <h1 class="header" style="text-align: center;">BMW Fit Gap Analysis Report</h1>
+        <h1 class="header">BMW Fit Gap Analysis Report</h1>
         <div class="tabs">
-            <button id="config-tab" class="tab-button active" onclick="switchTab('config')">Configuration</button>
-            <button id="customization-tab" class="tab-button" onclick="switchTab('customization')">Customization</button>
+            <button class="tablink" onclick="openPage('Configuration', this, '#0A1C3E')" id="defaultOpen">Configuration</button>
+            <button class="tablink" onclick="openPage('Customization', this, '#0A1C3E')">Customization</button>
         </div>
+
+        <div id="Configuration" class="tabcontent">
     """
 
     # Loop through each report in allInput
@@ -165,7 +217,11 @@ def generate_html_report(allInput):
         for item_id, item_data in data.items():
             html_content += "<tr>"
             for key, value in item_data.items():
-                html_content += f"<td>{value}</td>"
+                # Check if the key is "File path" and convert it to a hyperlink
+                if key == "File path":
+                    html_content += f'<td><a href="{value}" target="_blank">{getFileNameFromPath(value)}</a></td>'
+                else:
+                    html_content += f"<td>{value}</td>"
             html_content += "</tr>"
 
         # Close table for this report
@@ -176,13 +232,17 @@ def generate_html_report(allInput):
         """
 
     html_content += """
+        </div>
+        <div id="Customization" class="tabcontent">
+            <h3>Customization</h3>
+            <p>Working on it!</p>
+        </div>
     </body>
     </html>
     """
 
     # Write the generated HTML to a file
-    # Write the generated HTML to a file with UTF-8 encoding
-    with open("All_Reports.html", "w", encoding="utf-8") as html_file:
+    with open("Reports.html", "w", encoding="utf-8") as html_file:
         html_file.write(html_content)
 
-    print("HTML Report Generated: All_Reports.html")
+    print("HTML Report Generated: Reports.html")
