@@ -24,7 +24,7 @@ def generate_html_report(allInput):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>BMW | Fit Gap Report</title>
+        <title>BMW | Fit-Gap Report</title>
         <style>
             h1.header {
                 font-family: 'Roboto', sans-serif;
@@ -177,7 +177,7 @@ def generate_html_report(allInput):
     </head>
     <body>
         <!-- Tabs for Configuration and Customization -->
-        <h1 class="header">BMW Fit Gap Analysis Report</h1>
+        <h1 class="header">BMW Fit-Gap Analysis Report</h1>
         <div class="tabs">
             <button class="tablink" onclick="openPage('Configuration', this, '#0A1C3E')" id="defaultOpen">Configuration</button>
             <button class="tablink" onclick="openPage('Customization', this, '#0A1C3E')">Customization</button>
